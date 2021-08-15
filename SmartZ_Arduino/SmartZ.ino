@@ -34,6 +34,10 @@ void setup() {
   pinMode(pirPin, INPUT);
     // initialize serial communication:
   Serial.begin(115200);
+  if (!mlx.begin()) {
+    Serial.println("Error connecting to MLX sensor. Check wiring.");
+    while (1);
+  };
    pinMode(in1,OUTPUT); 
   pinMode(in2,OUTPUT); 
   //door open sequence
@@ -87,6 +91,18 @@ if (val == HIGH)
       delay(10);
       lcd.clear();
       lcd.println("mask confirm ");
+      temp = mlx.readObjectTempF();
+      if (temp>96) {
+        lcd.clear();
+        lcd.print("Temp: ");
+        lcd.print(temp);
+        lcd.print("F  ");
+       //delay(2000);
+        if (temp > 98.6){
+          lcd.setCursor(0,1);
+          lcd.println("Fever,step aside");
+          goto exit;
+        }
       delay(2000);
       lcd.clear();
       lcd.println("Opening door ");
@@ -97,7 +113,8 @@ if (val == HIGH)
         delay(2000); 
         digitalWrite(in1, LOW); 
         digitalWrite(in2, LOW);
-        door=1;}
+        door=1;
+      }
 
       
       
@@ -137,4 +154,6 @@ else
 
       }
   
-}}
+}
+exit:
+}
